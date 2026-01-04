@@ -1,0 +1,50 @@
+{
+  "name": "librarian",
+  "version": "0.1.0",
+  "description": "Local-first docs CLI",
+  "type": "module",
+  "bin": {
+    "librarian": "./librarian"
+  },
+  "scripts": {
+    "dev": "bun src/cli.ts",
+    "setup": "bun src/cli.ts setup",
+    "db": "bun src/cli.ts db",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply .",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@mozilla/readability": "^0.5.0",
+    "cheerio": "^1.0.0",
+    "fflate": "^0.8.2",
+    "linkedom": "^0.18.5",
+    "kysely": "^0.28.2",
+    "node-llama-cpp": "^3.14.5",
+    "picomatch": "^4.0.2",
+    "sqlite-vec": "^0.1.7-alpha.2",
+    "tree-sitter-wasms": "^0.1.12",
+    "turndown": "^7.2.0",
+    "puppeteer-core": "^24.0.0",
+    "undici": "^7.2.0",
+    "web-tree-sitter": "^0.22.6",
+    "yaml": "^2.8.2",
+    "zod": "^4.2.1"
+  },
+  "optionalDependencies": {
+    "sqlite-vec-darwin-arm64": "^0.1.7-alpha.2",
+    "sqlite-vec-darwin-x64": "^0.1.7-alpha.2",
+    "sqlite-vec-linux-x64": "^0.1.7-alpha.2",
+    "sqlite-vec-win32-x64": "^0.1.7-alpha.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "latest",
+    "@types/turndown": "^5.0.5"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "license": "MIT"
+}
