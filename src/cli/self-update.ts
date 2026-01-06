@@ -13,8 +13,17 @@ type InstallKind = "bun" | "npm" | "local" | "unknown";
 type UpdateCommand = { bin: string; args: string[]; pretty: string };
 
 function getRepoRoot(): string {
-  const currentFile = fileURLToPath(import.meta.url);
-  return dirname(dirname(dirname(currentFile)));
+  let currentDir = dirname(fileURLToPath(import.meta.url));
+  for (let i = 0; i < 6; i += 1) {
+    const candidate = join(currentDir, "package.json");
+    if (existsSync(candidate)) {
+      return currentDir;
+    }
+    const parent = dirname(currentDir);
+    if (parent === currentDir) break;
+    currentDir = parent;
+  }
+  return dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 }
 
 function detectLocalInstallCommand(): string {
