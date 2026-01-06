@@ -56,7 +56,7 @@ const TOOL_LIST = [
 
 export async function runMcpServer(): Promise<void> {
   const server = new Server(
-    { name: "librarian", version: "0.1.4" },
+    { name: "librarian", version: "0.1.5" },
     { capabilities: { tools: {} } },
   );
   const store = await createStore();

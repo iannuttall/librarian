@@ -13,6 +13,10 @@ type InstallKind = "bun" | "npm" | "local" | "unknown";
 type UpdateCommand = { bin: string; args: string[]; pretty: string };
 
 function getRepoRoot(): string {
+  const override = process.env.LIBRARIAN_PACKAGE_JSON;
+  if (override && existsSync(override)) {
+    return dirname(override);
+  }
   let currentDir = dirname(fileURLToPath(import.meta.url));
   for (let i = 0; i < 6; i += 1) {
     const candidate = join(currentDir, "package.json");
@@ -43,6 +47,18 @@ function detectLocalInstallCommand(): string {
 }
 
 function readPackageJson(): { name?: string; version?: string } {
+  if (process.env.LIBRARIAN_PACKAGE_VERSION) {
+    return { version: process.env.LIBRARIAN_PACKAGE_VERSION };
+  }
+  const override = process.env.LIBRARIAN_PACKAGE_JSON;
+  if (override && existsSync(override)) {
+    try {
+      const content = readFileSync(override, "utf8");
+      return JSON.parse(content) as { name?: string; version?: string };
+    } catch {
+      return {};
+    }
+  }
   try {
     const content = readFileSync(join(getRepoRoot(), "package.json"), "utf8");
     return JSON.parse(content) as { name?: string; version?: string };

@@ -18,6 +18,7 @@ if (!hasBun()) {
 
 const repoRoot = dirname(__dirname);
 const cliPath = join(repoRoot, "src", "cli.ts");
+process.env.LIBRARIAN_PACKAGE_JSON ??= join(repoRoot, "package.json");
 
 const result = spawnSync("bun", [cliPath, ...process.argv.slice(2)], {
   stdio: "inherit",
