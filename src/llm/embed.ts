@@ -1,10 +1,19 @@
-import { getLlama, resolveModelFile, LlamaLogLevel, type Llama, type LlamaModel, type LlamaEmbeddingContext } from "node-llama-cpp";
+import type { Llama, LlamaModel, LlamaEmbeddingContext } from "node-llama-cpp";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { existsSync, mkdirSync } from "node:fs";
 
 const DEFAULT_EMBED_MODEL = "hf:ggml-org/embeddinggemma-300M-GGUF/embeddinggemma-300M-Q8_0.gguf";
 const MODEL_CACHE_DIR = join(homedir(), ".cache", "librarian", "models");
+
+let nodeLlamaCpp: typeof import("node-llama-cpp") | null = null;
+
+async function getNodeLlamaCpp() {
+  if (!nodeLlamaCpp) {
+    nodeLlamaCpp = await import("node-llama-cpp");
+  }
+  return nodeLlamaCpp;
+}
 
 let llamaInstance: Llama | null = null;
 let embedModel: LlamaModel | null = null;
@@ -34,6 +43,7 @@ export async function ensureEmbeddingModel(uri?: string): Promise<string> {
 
 export async function resolveEmbeddingModel(uri: string, download: "auto" | false = "auto"): Promise<string> {
   ensureModelCacheDir();
+  const { resolveModelFile } = await getNodeLlamaCpp();
   return resolveModelFile(uri, { directory: MODEL_CACHE_DIR, download, headers: getModelHeaders() });
 }
 
@@ -90,6 +100,7 @@ async function ensureEmbedContext(uri: string): Promise<LlamaEmbeddingContext> {
 async function ensureEmbedModel(uri: string): Promise<LlamaModel> {
   if (embedModel) return embedModel;
   const llama = await ensureLlama();
+  const { resolveModelFile } = await getNodeLlamaCpp();
   const modelPath = await resolveModelFile(uri, MODEL_CACHE_DIR);
   embedModel = await llama.loadModel({ modelPath });
   return embedModel;
@@ -97,9 +108,10 @@ async function ensureEmbedModel(uri: string): Promise<LlamaModel> {
 
 async function ensureLlama(): Promise<Llama> {
   if (!llamaInstance) {
+    const { getLlama, LlamaLogLevel } = await getNodeLlamaCpp();
     llamaInstance = await getLlama({ logLevel: LlamaLogLevel.error });
   }
-  return llamaInstance;
+  return llamaInstance!;
 }
 
 function ensureModelCacheDir(): void {

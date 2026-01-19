@@ -1,19 +1,5 @@
 #!/usr/bin/env bun
-import { createStore } from "./store/db";
 import { printHelp } from "./cli/help";
-import { cmdInit, cmdSetup, cmdOnboard } from "./cli/setup";
-import { cmdStatus, cmdCleanup } from "./cli/status";
-import { cmdGet } from "./cli/get";
-import { cmdSearch, cmdVSearch, cmdQuery } from "./cli/search";
-import { cmdEmbed } from "./cli/embed";
-import { cmdDetect } from "./cli/detect";
-import { cmdSource, cmdAdd } from "./cli/source";
-import { cmdIngest } from "./cli/ingest";
-import { cmdLibrary } from "./cli/library";
-import { cmdDb } from "./cli/db";
-import { cmdReset } from "./cli/reset";
-import { cmdSeed } from "./cli/seed";
-import { runMcpServer } from "./mcp";
 import { cmdUpdate, cmdVersion, maybeCheckForUpdate } from "./cli/self-update";
 
 const argv = process.argv.slice(2);
@@ -32,8 +18,10 @@ if (command === "--version" || command === "-v") {
 }
 
 if (command === "mcp") {
+  const { runMcpServer } = await import("./mcp");
   await runMcpServer();
 } else if (command === "reset") {
+  const { cmdReset } = await import("./cli/reset");
   await cmdReset(argv.slice(1));
 } else if (command === "version") {
   cmdVersion();
@@ -41,60 +29,95 @@ if (command === "mcp") {
   await cmdUpdate();
 } else {
   await maybeCheckForUpdate(command, argv.slice(1));
+  const { createStore } = await import("./store/db");
   const store = await createStore();
   try {
     switch (command) {
-      case "init":
+      case "init": {
+        const { cmdInit } = await import("./cli/setup");
         cmdInit();
         break;
-      case "setup":
+      }
+      case "setup": {
+        const { cmdSetup } = await import("./cli/setup");
         await cmdSetup(argv.slice(1), store);
         break;
-      case "onboard":
+      }
+      case "onboard": {
+        const { cmdOnboard } = await import("./cli/setup");
         await cmdOnboard(argv.slice(1), store);
         break;
-      case "source":
+      }
+      case "source": {
+        const { cmdSource } = await import("./cli/source");
         await cmdSource(store, argv.slice(1));
         break;
-      case "add":
+      }
+      case "add": {
+        const { cmdAdd } = await import("./cli/source");
         await cmdAdd(store, argv.slice(1));
         break;
-      case "ingest":
+      }
+      case "ingest": {
+        const { cmdIngest } = await import("./cli/ingest");
         await cmdIngest(store, argv.slice(1));
         break;
-      case "detect":
+      }
+      case "detect": {
+        const { cmdDetect } = await import("./cli/detect");
         await cmdDetect(argv.slice(1));
         break;
-      case "embed":
+      }
+      case "embed": {
+        const { cmdEmbed } = await import("./cli/embed");
         await cmdEmbed(store, argv.slice(1));
         break;
-      case "search":
+      }
+      case "search": {
+        const { cmdSearch } = await import("./cli/search");
         await cmdSearch(store, argv.slice(1));
         break;
-      case "library":
+      }
+      case "library": {
+        const { cmdLibrary } = await import("./cli/library");
         await cmdLibrary(store, argv.slice(1));
         break;
-      case "vsearch":
+      }
+      case "vsearch": {
+        const { cmdVSearch } = await import("./cli/search");
         await cmdVSearch(store, argv.slice(1));
         break;
-      case "query":
+      }
+      case "query": {
+        const { cmdQuery } = await import("./cli/search");
         await cmdQuery(store, argv.slice(1));
         break;
-      case "get":
+      }
+      case "get": {
+        const { cmdGet } = await import("./cli/get");
         await cmdGet(store, argv.slice(1));
         break;
-      case "db":
+      }
+      case "db": {
+        const { cmdDb } = await import("./cli/db");
         await cmdDb(store, argv.slice(1));
         break;
-      case "status":
+      }
+      case "status": {
+        const { cmdStatus } = await import("./cli/status");
         await cmdStatus(store);
         break;
-      case "cleanup":
+      }
+      case "cleanup": {
+        const { cmdCleanup } = await import("./cli/status");
         await cmdCleanup(store);
         break;
-      case "seed":
+      }
+      case "seed": {
+        const { cmdSeed } = await import("./cli/seed");
         await cmdSeed(store, argv.slice(1));
         break;
+      }
       default:
         printHelp(false);
         process.exit(1);
